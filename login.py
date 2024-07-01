@@ -11,7 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 def setup_driver():
     options = webdriver.ChromeOptions()
-    # options.add_argument("--headless")
+    options.add_argument("--headless")
     driver = webdriver.Chrome(options=options)
     driver.set_window_size(1920, 1080)
     return driver
