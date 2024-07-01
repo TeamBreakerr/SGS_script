@@ -132,7 +132,7 @@ def main():
         print("Entering game...")
         WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'gameItemOl'))).click()
         WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'goInGameBtn'))).click()
-        sleep(20)
+        sleep(40)
 
         print("Performing game actions...")
         perform_game_actions(driver)
