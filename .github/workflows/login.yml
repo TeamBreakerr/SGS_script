@@ -14,5 +14,5 @@ jobs:
       - name: Install Selenium
         run: pip install selenium==4.17.2
 
-      - name: Majsoul login
+      - name: SGS login
         run: python login.py ${{ secrets.EMAIL }} ${{ secrets.PASSWD }}
