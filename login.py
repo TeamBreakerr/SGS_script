@@ -1,5 +1,6 @@
 import random
 import sys
+from datetime import datetime
 from time import sleep
 
 from selenium import webdriver
@@ -65,13 +66,13 @@ def perform_game_actions(driver):
     print("Waiting for game screen to load...")
     screen = WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, 'layaCanvas')))
 
-    driver.save_screenshot('1.png')
+    # driver.save_screenshot('1.png')
 
     print("Closing activity window...")
     click_with_offset(driver, screen, 344, -235)
     sleep(5)
 
-    driver.save_screenshot('2.png')
+    # driver.save_screenshot('2.png')
 
     print("Clicking sign-in button...")
     click_with_offset(driver, screen, 408, 232)
@@ -82,25 +83,31 @@ def perform_game_actions(driver):
         click_with_offset(driver, screen, 513, -291)
         sleep(1)
 
-    driver.save_screenshot('3.png')
+    # driver.save_screenshot('3.png')
 
     print("Navigating to 免费武将包...")
     click_with_offset(driver, screen, 656, 513)  # Click 武将 button
     sleep(5)
 
-    driver.save_screenshot('4.png')
+    # driver.save_screenshot('4.png')
 
     print("Clicking 招武将...")
     click_with_offset(driver, screen, 464, 289)
     sleep(5)
 
-    driver.save_screenshot('5.png')
+    # driver.save_screenshot('5.png')
+
+    # 获取当前日期中的日（number of the day in the month）
+    current_day = datetime.now().day
+
+    # 根据当前日期延迟相应秒数
+    sleep(current_day)
 
     print("Clicking open once...")
     click_with_offset(driver, screen, -147, 191)
     sleep(5)
 
-    driver.save_screenshot('6.png')
+    # driver.save_screenshot('6.png')
 
     print("Clicking cancel to prevent purchase...")
     click_with_offset(driver, screen, 64, 70)
@@ -115,7 +122,7 @@ def perform_game_actions(driver):
     click_with_offset(driver, screen, 933, 518)
     sleep(5)
 
-    driver.save_screenshot('7.png')
+    # driver.save_screenshot('7.png')
 
     print("Clicking money tree...")
     click_with_offset(driver, screen, 841, 359)
@@ -125,7 +132,7 @@ def perform_game_actions(driver):
     click_with_offset(driver, screen, 120, 32)
     sleep(5)
 
-    driver.save_screenshot('8.png')
+    # driver.save_screenshot('8.png')
 
     print("Randomly clicking on 桃子区域...")
     click_random_points(driver, screen, (-241, 170), (285, 273))
