@@ -101,7 +101,7 @@ def perform_game_actions(driver):
     current_day = datetime.now().day
 
     # 根据当前日期延迟相应秒数
-    sleep(current_day)
+    sleep(current_day * 60)
 
     print("Clicking open once...")
     click_with_offset(driver, screen, -147, 191)
