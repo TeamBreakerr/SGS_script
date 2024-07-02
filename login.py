@@ -65,54 +65,73 @@ def perform_game_actions(driver):
     print("Waiting for game screen to load...")
     screen = WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, 'layaCanvas')))
 
+    driver.save_screenshot('1.png')
+
     print("Closing activity window...")
-    click_with_offset(driver, screen, 342, -234)
+    click_with_offset(driver, screen, 344, -235)
     sleep(5)
 
+    driver.save_screenshot('2.png')
+
     print("Clicking sign-in button...")
-    click_with_offset(driver, screen, 408, 239)
+    click_with_offset(driver, screen, 408, 232)
     sleep(5)
 
     print("Closing additional windows...")
     for _ in range(3):
-        click_with_offset(driver, screen, 512, -290)
+        click_with_offset(driver, screen, 513, -291)
         sleep(1)
 
+    driver.save_screenshot('3.png')
+
     print("Navigating to 免费武将包...")
-    click_with_offset(driver, screen, 646, 417)  # Click 武将 button
+    click_with_offset(driver, screen, 656, 513)  # Click 武将 button
     sleep(5)
+
+    driver.save_screenshot('4.png')
 
     print("Clicking 招武将...")
-    click_with_offset(driver, screen, 463, 286)
+    click_with_offset(driver, screen, 464, 289)
     sleep(5)
+
+    driver.save_screenshot('5.png')
 
     print("Clicking open once...")
-    click_with_offset(driver, screen, -146, 190)
+    click_with_offset(driver, screen, -147, 191)
     sleep(5)
 
+    driver.save_screenshot('6.png')
+
     print("Clicking cancel to prevent purchase...")
-    click_with_offset(driver, screen, 62, 68)
+    click_with_offset(driver, screen, 64, 70)
     sleep(5)
 
     print("Closing windows...")
     for _ in range(3):
-        click_with_offset(driver, screen, 529, -314)
+        click_with_offset(driver, screen, 531, -312)
         sleep(1)
 
     print("Clicking more to access 发财树...")
-    click_with_offset(driver, screen, 925, 417)
+    click_with_offset(driver, screen, 933, 518)
     sleep(5)
 
+    driver.save_screenshot('7.png')
+
     print("Clicking money tree...")
-    click_with_offset(driver, screen, 836, 255)
+    click_with_offset(driver, screen, 841, 359)
     sleep(5)
 
     print("Clicking 斧头...")
-    click_with_offset(driver, screen, 147, 40)
+    click_with_offset(driver, screen, 120, 32)
     sleep(5)
 
+    driver.save_screenshot('8.png')
+
     print("Randomly clicking on 桃子区域...")
-    click_random_points(driver, screen, (-312, 128), (356, 267))
+    click_random_points(driver, screen, (-241, 170), (285, 273))
+
+    driver.save_screenshot('9.png')
+
     print("Completed game actions.")
 
 
@@ -132,13 +151,13 @@ def main():
         print("Entering game...")
         WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'gameItemOl'))).click()
         WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'goInGameBtn'))).click()
-        sleep(40)
+        sleep(60)
 
         print("Performing game actions...")
         perform_game_actions(driver)
 
         print("Waiting for two hours...")
-       # WebDriverWait(driver, 7200).until(lambda d: False)
+        # WebDriverWait(driver, 7200).until(lambda d: False)
         print("Script finished.")
 
 
