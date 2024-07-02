@@ -1,4 +1,4 @@
-name: Majsoul-Login
+name: SGS-Login
 on:
   workflow_dispatch:
   schedule: #5:00
