@@ -138,7 +138,7 @@ def main():
         perform_game_actions(driver)
 
         print("Waiting for two hours...")
-        WebDriverWait(driver, 7200).until(lambda d: False)
+       # WebDriverWait(driver, 7200).until(lambda d: False)
         print("Script finished.")
 
 
