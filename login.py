@@ -64,7 +64,7 @@ def click_random_points(driver, element, top_left, bottom_right, num_clicks=10):
 
 def perform_game_actions(driver):
     print("Waiting for game screen to load...")
-    screen = WebDriverWait(driver, 20).until(EC.visibility_of_element_located((By.ID, 'layaCanvas')))
+    screen = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'layaCanvas')))
 
     # driver.save_screenshot('1.png')
 
