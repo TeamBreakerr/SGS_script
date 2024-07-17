@@ -14,5 +14,11 @@ jobs:
       - name: Install Selenium
         run: pip install selenium==4.17.2
 
+      - name: Install Opencv
+        run: pip install opencv-python
+
+      - name: Install numpy
+        run: pip install numpy
+
       - name: SGS login
         run: python login.py ${{ secrets.EMAIL }} ${{ secrets.PASSWD }}
