@@ -52,21 +52,43 @@ def find_and_click(driver, screen, template_path, threshold=0.8):
     _, W, H = screenshot.shape[::-1]
 
     template = cv2.imread(template_path, 0)
-    w, h = template.shape[::-1]
 
-    screenshot_gray = cv2.cvtColor(screenshot, cv2.COLOR_BGR2GRAY)
+    # 初始化SIFT检测器
+    sift = cv2.SIFT_create()
 
-    res = cv2.matchTemplate(screenshot_gray, template, cv2.TM_CCOEFF_NORMED)
-    loc = np.where(res >= threshold)
+    # 对屏幕截图和模板图像使用SIFT进行关键点和描述符的检测
+    keypoints_screenshot, descriptors_screenshot = sift.detectAndCompute(screenshot, None)
+    keypoints_template, descriptors_template = sift.detectAndCompute(template, None)
 
-    for pt in zip(*loc[::-1]):
-        top_left = pt
-        bottom_right = (top_left[0] + w, top_left[1] + h)
-        centre = (bottom_right[0] + top_left[0]) / 2, (bottom_right[1] + top_left[1]) / 2
+    # 创建BFMatcher对象，使用默认参数
+    bf = cv2.BFMatcher()
+    matches = bf.knnMatch(descriptors_template, descriptors_screenshot, k=2)
 
+    # 使用比率测试筛选出好的匹配点
+    good_matches = []
+    for m, n in matches:
+        if m.distance < 0.75 * n.distance:
+            good_matches.append(m)
+
+    # 仅当有足够的好的匹配点时，尝试找到单应性矩阵
+    if len(good_matches) >= 4:
+        src_pts = np.float32([keypoints_template[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+        dst_pts = np.float32([keypoints_screenshot[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
+
+        # 计算单应性矩阵
+        M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC, 5.0)
+        h, w = template.shape
+        pts = np.float32([[0, 0], [0, h - 1], [w - 1, h - 1], [w - 1, 0]]).reshape(-1, 1, 2)
+        dst = cv2.perspectiveTransform(pts, M)
+
+        # 找到变换后的四个角点在主图像中的位置
+        rect = np.int32(dst)
+        centre = rect.mean(axis=0).flatten()
+
+        # 使用ActionChains点击找到的中心点
         ActionChains(driver).move_to_element_with_offset(screen, centre[0] - W / 2, centre[1] - H / 2).click().perform()
+        print(centre[0] - W / 2, centre[1] - H / 2)
         sleep(5)
-        break
 
 
 def click_random_points(driver, element, top_left, bottom_right, num_clicks=10):
@@ -93,8 +115,8 @@ def perform_game_actions(driver):
     print("Waiting for game screen to load...")
     screen = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'layaCanvas')))
 
-    # print("Closing FUCKING window...")
-    # find_and_click(driver, screen, 'templates/quxiao.png')
+    print("Closing FUCKING window...")
+    find_and_click(driver, screen, 'templates/quxiao_button.png')
 
     driver.save_screenshot('0.png')
 
@@ -116,13 +138,34 @@ def perform_game_actions(driver):
     find_and_click(driver, screen, 'templates/close_window.png')
     driver.save_screenshot('5.png')
 
+    print("Clicking more to access 发财树...")
+    find_and_click(driver, screen, 'templates/gengduo_button.png')
+    driver.save_screenshot('6.png')
+
+    print("Clicking money tree...")
+    find_and_click(driver, screen, 'templates/facaishu_button.png')
+    driver.save_screenshot('7.png')
+
+    print("Clicking 斧头...")
+    find_and_click(driver, screen, 'templates/futou_button.png')
+    driver.save_screenshot('8.png')
+
+    print("Randomly clicking on 桃子区域...")
+    # click_random_points(driver, screen, (-241, 170), (285, 273))
+    find_and_click(driver, screen, 'templates/taozi.png')
+    driver.save_screenshot('9.png')
+
+    print("Closing windows...")
+    for _ in range(3):
+        find_and_click(driver, screen, 'templates/close_window.png')
+
     print("Navigating to 免费武将包...")
     find_and_click(driver, screen, 'templates/wujiang_button.png')  # Click 武将 button
-    driver.save_screenshot('6.png')
+    driver.save_screenshot('10.png')
 
     print("Clicking 招武将...")
     find_and_click(driver, screen, 'templates/zhaowujiang_button.png')
-    driver.save_screenshot('7.png')
+    driver.save_screenshot('11.png')
 
     # 获取当前日期中的日（number of the day in the month）
     current_day = datetime.now().day
@@ -132,30 +175,10 @@ def perform_game_actions(driver):
 
     print("Clicking open once...")
     find_and_click(driver, screen, 'templates/kaiqiyici_button.png')
-    driver.save_screenshot('8.png')
+    driver.save_screenshot('12.png')
 
     print("Clicking cancel to prevent purchase...")
     find_and_click(driver, screen, 'templates/quxiao_button.png')
-    driver.save_screenshot('9.png')
-
-    print("Closing windows...")
-    for _ in range(3):
-        find_and_click(driver, screen, 'templates/close_window.png')
-
-    print("Clicking more to access 发财树...")
-    find_and_click(driver, screen, 'templates/gengduo_button.png')
-    driver.save_screenshot('10.png')
-
-    print("Clicking money tree...")
-    find_and_click(driver, screen, 'templates/facaishu_button.png')
-    driver.save_screenshot('11.png')
-
-    print("Clicking 斧头...")
-    find_and_click(driver, screen, 'templates/futou_button.png')
-    driver.save_screenshot('12.png')
-
-    print("Randomly clicking on 桃子区域...")
-    click_random_points(driver, screen, (-241, 170), (285, 273))
     driver.save_screenshot('13.png')
 
     print("Completed game actions.")
@@ -185,6 +208,7 @@ def main():
         print("Waiting for two hours...")
         # WebDriverWait(driver, 7200).until(lambda d: False)
         print("Script finished.")
+        driver.quit()
 
 
 if __name__ == "__main__":
