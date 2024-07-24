@@ -91,7 +91,7 @@ def find_and_click(driver, screen, template_path, threshold=0.8):
         sleep(5)
 
 
-def click_random_points(driver, element, top_left, bottom_right, num_clicks=10):
+def click_random_points(driver, element, top_left, bottom_right, num_clicks=20):
     """
     在指定元素的给定区域内随机点击若干点。
 
@@ -151,8 +151,18 @@ def perform_game_actions(driver):
     driver.save_screenshot('8.png')
 
     print("Randomly clicking on 桃子区域...")
-    # click_random_points(driver, screen, (-241, 170), (285, 273))
-    find_and_click(driver, screen, 'templates/taozi.png')
+    screen_size = screen.size
+
+    width = screen_size['width']
+    height = screen_size['height']
+    top_left_x = -width // 6
+    top_left_y = 0
+    bottom_right_x = width // 6
+    bottom_right_y = height // 4
+    print(f"Top-left corner: ({top_left_x}, {top_left_y})")
+    print(f"Bottom-right corner: ({bottom_right_x}, {bottom_right_y})")
+
+    click_random_points(driver, screen, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
     driver.save_screenshot('9.png')
 
     print("Closing windows...")
