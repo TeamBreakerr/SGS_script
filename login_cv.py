@@ -111,6 +111,45 @@ def click_random_points(driver, element, top_left, bottom_right, num_clicks=20):
         ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
 
 
+def click_evenly_distributed_points(driver, element, top_left, bottom_right, num_clicks=30):
+    """
+    在指定元素的给定区域内均匀点击若干点。
+
+    参数:
+    driver -- WebDriver 实例。
+    element -- Selenium 元素，点击动作的基础位置。
+    top_left (tuple) -- 区域的左上角坐标 (x, y)。
+    bottom_right (tuple) -- 区域的右下角坐标 (x, y)。
+    num_clicks (int) -- 要执行的点击次数，默认为10次。
+    """
+    width = bottom_right[0] - top_left[0]
+    height = bottom_right[1] - top_left[1]
+
+    # 计算每一行和每一列应该有多少个点
+    points_per_row = int(num_clicks ** 0.5)
+    points_per_col = points_per_row
+
+    if points_per_row * points_per_col < num_clicks:
+        points_per_col += 1
+
+    # 计算每个点之间的间距
+    x_spacing = width // (points_per_row - 1)
+    y_spacing = height // (points_per_col - 1)
+
+    # 生成点击点的坐标
+    click_points = []
+    for i in range(points_per_row):
+        for j in range(points_per_col):
+            if len(click_points) < num_clicks:
+                x = top_left[0] + i * x_spacing
+                y = top_left[1] + j * y_spacing
+                click_points.append((x, y))
+
+    # 执行点击动作
+    for point in click_points:
+        ActionChains(driver).move_to_element_with_offset(element, point[0], point[1]).click().perform()
+
+
 def perform_game_actions(driver):
     print("Waiting for game screen to load...")
     screen = WebDriverWait(driver, 60).until(EC.visibility_of_element_located((By.ID, 'layaCanvas')))
@@ -162,7 +201,9 @@ def perform_game_actions(driver):
     print(f"Top-left corner: ({top_left_x}, {top_left_y})")
     print(f"Bottom-right corner: ({bottom_right_x}, {bottom_right_y})")
 
-    click_random_points(driver, screen, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
+    # click_random_points(driver, screen, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
+    click_evenly_distributed_points(driver, screen, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
+
     driver.save_screenshot('9.png')
 
     print("Closing windows...")
