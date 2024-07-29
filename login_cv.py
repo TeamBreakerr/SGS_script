@@ -111,7 +111,7 @@ def click_random_points(driver, element, top_left, bottom_right, num_clicks=20):
         ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
 
 
-def click_evenly_distributed_points(driver, element, top_left, bottom_right, num_clicks=30):
+def click_evenly_distributed_points(driver, element, top_left, bottom_right, num_clicks=50):
     """
     在指定元素的给定区域内均匀点击若干点。
 
