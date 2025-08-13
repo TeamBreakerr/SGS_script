@@ -4,31 +4,33 @@ from datetime import datetime
 from time import sleep
 
 from playwright.sync_api import sync_playwright
+import cv2
+import numpy as np
 
 
 def setup_driver():
-    # 启动浏览器
+    # 使用Playwright启动浏览器并确保事件循环正常
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)  # 设置headless为False显示浏览器
-        page = browser.new_page()
-        return page
+        browser = p.chromium.launch(headless=True)  # 启动无头浏览器
+        page = browser.new_page()  # 创建一个新的页面
+        return page, browser
 
 
 def login(page, email, password):
     print("Navigating to login page...")
-    page.goto("https://web.sanguosha.com/login/index.html")
+    page.goto("https://web.sanguosha.com/login/index.html")  # 打开登录页面
 
     print("Entering email...")
-    page.fill('#SGS_login-account', email)
+    page.fill('#SGS_login-account', email)  # 填写邮箱
 
     print("Entering password...")
-    page.fill('#SGS_login-password', password)
+    page.fill('#SGS_login-password', password)  # 填写密码
 
     print("Accepting user agreement...")
-    page.click('#SGS_userProto')
+    page.click('#SGS_userProto')  # 点击同意协议
 
     print("Performing login...")
-    page.click('#SGS_login-btn')
+    page.click('#SGS_login-btn')  # 点击登录按钮
     print("Login successful.")
 
 
@@ -67,9 +69,41 @@ def find_and_click(page, template_path, threshold=0.8):
         page.mouse.click(centre[0], centre[1])
 
 
+def click_random_points(page, element, top_left, bottom_right, num_clicks=20):
+    for _ in range(num_clicks):
+        x = random.randint(top_left[0], bottom_right[0])
+        y = random.randint(top_left[1], bottom_right[1])
+        element.mouse.click(x, y)
+
+
+def click_evenly_distributed_points(page, element, top_left, bottom_right, num_clicks=50):
+    width = bottom_right[0] - top_left[0]
+    height = bottom_right[1] - top_left[1]
+
+    points_per_row = int(num_clicks ** 0.5)
+    points_per_col = points_per_row
+
+    if points_per_row * points_per_col < num_clicks:
+        points_per_col += 1
+
+    x_spacing = width // (points_per_row - 1)
+    y_spacing = height // (points_per_col - 1)
+
+    click_points = []
+    for i in range(points_per_row):
+        for j in range(points_per_col):
+            if len(click_points) < num_clicks:
+                x = top_left[0] + i * x_spacing
+                y = top_left[1] + j * y_spacing
+                click_points.append((x, y))
+
+    for point in click_points:
+        element.mouse.click(point[0], point[1])
+
+
 def perform_game_actions(page):
     print("Waiting for game screen to load...")
-    page.wait_for_selector('#layaCanvas')
+    page.wait_for_selector('#layaCanvas')  # 等待游戏画面加载
 
     print("Closing FUCKING window...")
     find_and_click(page, 'templates/quxiao_button.png')
@@ -118,7 +152,7 @@ def perform_game_actions(page):
     print(f"Top-left corner: ({top_left_x}, {top_left_y})")
     print(f"Bottom-right corner: ({bottom_right_x}, {bottom_right_y})")
 
-    click_evenly_distributed_points(page, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
+    click_evenly_distributed_points(page, page, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
 
     take_screenshot(page, '9.png')
 
@@ -156,10 +190,10 @@ def main():
         passwd = sys.argv[1 + i + acccounts]
         print('----------------------------')
 
-        page = setup_driver()
+        page, browser = setup_driver()  # 获取页面和浏览器对象
 
         print("Starting login process...")
-        login(page, email, passwd)
+        login(page, email, passwd)  # 执行登录
 
         print("Entering game...")
         page.click('#gameItemOl')
@@ -167,13 +201,12 @@ def main():
         sleep(60)
 
         print("Performing game actions...")
-        perform_game_actions(page)
+        perform_game_actions(page)  # 执行游戏操作
 
         print("Waiting for two hours...")
         print("Script finished.")
-        page.context.close()
+        browser.close()  # 关闭浏览器
 
 
 if __name__ == "__main__":
     main()
-
