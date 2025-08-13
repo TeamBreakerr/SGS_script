@@ -9,7 +9,7 @@ from playwright.sync_api import sync_playwright
 def setup_driver():
     # 启动浏览器
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)  # 设置headless为False显示浏览器
+        browser = p.chromium.launch(headless=True)  # 设置headless为False显示浏览器
         page = browser.new_page()
         return page
 
@@ -176,3 +176,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
