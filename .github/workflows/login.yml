@@ -12,7 +12,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install playwright
-        run: pip install playwright
+        run: |
+          pip install playwright
+          playwright install  # Ensure the required browsers are installed
 
       - name: Install Opencv
         run: pip install opencv-python
