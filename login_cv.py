@@ -53,12 +53,12 @@ def find_and_click(driver, screen, template_path, threshold=0.8):
 
     template = cv2.imread(template_path, 0)
 
-    # 初始化SIFT检测器
-    sift = cv2.SIFT_create()
+    # 使用ORB替代SIFT
+    orb = cv2.ORB_create()
 
-    # 对屏幕截图和模板图像使用SIFT进行关键点和描述符的检测
-    keypoints_screenshot, descriptors_screenshot = sift.detectAndCompute(screenshot, None)
-    keypoints_template, descriptors_template = sift.detectAndCompute(template, None)
+    # 对屏幕截图和模板图像使用ORB进行关键点和描述符的检测
+    keypoints_screenshot, descriptors_screenshot = orb.detectAndCompute(screenshot, None)
+    keypoints_template, descriptors_template = orb.detectAndCompute(template, None)
 
     # 创建BFMatcher对象，使用默认参数
     bf = cv2.BFMatcher()
@@ -94,49 +94,29 @@ def find_and_click(driver, screen, template_path, threshold=0.8):
 def click_random_points(driver, element, top_left, bottom_right, num_clicks=20):
     """
     在指定元素的给定区域内随机点击若干点。
-
-    参数:
-    driver -- WebDriver 实例。
-    element -- Selenium 元素，点击动作的基础位置。
-    top_left (tuple) -- 区域的左上角坐标 (x, y)。
-    bottom_right (tuple) -- 区域的右下角坐标 (x, y)。
-    num_clicks (int) -- 要执行的点击次数，默认为10次。
     """
     for _ in range(num_clicks):
-        # 生成随机坐标点
         x = random.randint(top_left[0], bottom_right[0])
         y = random.randint(top_left[1], bottom_right[1])
-
-        # 使用 ActionChains 执行点击
         ActionChains(driver).move_to_element_with_offset(element, x, y).click().perform()
 
 
 def click_evenly_distributed_points(driver, element, top_left, bottom_right, num_clicks=50):
     """
     在指定元素的给定区域内均匀点击若干点。
-
-    参数:
-    driver -- WebDriver 实例。
-    element -- Selenium 元素，点击动作的基础位置。
-    top_left (tuple) -- 区域的左上角坐标 (x, y)。
-    bottom_right (tuple) -- 区域的右下角坐标 (x, y)。
-    num_clicks (int) -- 要执行的点击次数，默认为10次。
     """
     width = bottom_right[0] - top_left[0]
     height = bottom_right[1] - top_left[1]
 
-    # 计算每一行和每一列应该有多少个点
     points_per_row = int(num_clicks ** 0.5)
     points_per_col = points_per_row
 
     if points_per_row * points_per_col < num_clicks:
         points_per_col += 1
 
-    # 计算每个点之间的间距
     x_spacing = width // (points_per_row - 1)
     y_spacing = height // (points_per_col - 1)
 
-    # 生成点击点的坐标
     click_points = []
     for i in range(points_per_row):
         for j in range(points_per_col):
@@ -145,7 +125,6 @@ def click_evenly_distributed_points(driver, element, top_left, bottom_right, num
                 y = top_left[1] + j * y_spacing
                 click_points.append((x, y))
 
-    # 执行点击动作
     for point in click_points:
         ActionChains(driver).move_to_element_with_offset(element, point[0], point[1]).click().perform()
 
@@ -201,7 +180,6 @@ def perform_game_actions(driver):
     print(f"Top-left corner: ({top_left_x}, {top_left_y})")
     print(f"Bottom-right corner: ({bottom_right_x}, {bottom_right_y})")
 
-    # click_random_points(driver, screen, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
     click_evenly_distributed_points(driver, screen, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y))
 
     driver.save_screenshot('9.png')
@@ -218,10 +196,7 @@ def perform_game_actions(driver):
     find_and_click(driver, screen, 'templates/zhaowujiang_button.png')
     driver.save_screenshot('11.png')
 
-    # 获取当前日期中的日（number of the day in the month）
     current_day = datetime.now().day
-
-    # 根据当前日期延迟相应秒数
     sleep(current_day * 60)
 
     print("Clicking open once...")
@@ -257,7 +232,6 @@ def main():
         perform_game_actions(driver)
 
         print("Waiting for two hours...")
-        # WebDriverWait(driver, 7200).until(lambda d: False)
         print("Script finished.")
         driver.quit()
 
