@@ -11,8 +11,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install Selenium
-        run: pip install selenium==4.17.2
+      - name: Install playwright
+        run: pip install playwright
 
       - name: Install Opencv
         run: pip install opencv-python
