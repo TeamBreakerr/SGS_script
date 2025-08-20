@@ -292,7 +292,7 @@ def main():
 
         with sync_playwright() as p:
             try:
-                browser = p.chromium.launch(headless=False)
+                browser = p.chromium.launch(headless=True)
                 context = browser.new_context()
                 page = context.new_page()
 
@@ -322,3 +322,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
